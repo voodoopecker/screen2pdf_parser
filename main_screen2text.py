@@ -4,7 +4,7 @@ from loguru import logger as LOGGER
 from selenium import webdriver
 from selenium.webdriver import Keys
 from selenium.webdriver.common.action_chains import ActionChains
-from settings import url, pages_number, parser_delay_time
+from settings import url, pages_number
 
 # настройки логирования
 LOGGER.add('logs/debug.log', format='{time}|{level}|{module}.{function}:{line} - {message}', level='DEBUG')
@@ -21,7 +21,7 @@ except:
     LOGGER.error('Ошибка при открытии ссылки!')
 
 # цикл сохранения страниц
-time.sleep(parser_delay_time)
+input('Нажми ENTER по готовности')
 page_counter = 1
 LOGGER.debug('Начинаю сохранять страницы:')
 for i in range(pages_number):
