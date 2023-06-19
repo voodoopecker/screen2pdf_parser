@@ -25,8 +25,8 @@ def scrap_screenshots():
     page_counter = 1
     LOGGER.debug('Начинаю сохранять страницы:')
     for i in range(pages_number):
-        driver.save_screenshot(f'saved_pages/page_0{page_counter}.png')  # делаем снимок экрана
-        LOGGER.debug(f'Сохраняю страницу Page 0{page_counter}')
+        driver.save_screenshot(f'saved_pages/page_0{page_counter}c.png')  # делаем снимок экрана
+        LOGGER.debug(f'Сохраняю страницу Page 0{page_counter}c')
         page_counter += 1
         ActionChains(driver).key_down(Keys.ARROW_DOWN).perform()  # нажимаем кнопку вниз для перехода на следующую страницу
         time.sleep(1)
@@ -61,31 +61,33 @@ def sort_by_number(item):
 
 
 # сохраняем в один pdf файл
-def convert_to_pdf():
+def convert_to_pdf(pict_path):
     LOGGER.debug(f'Конвертация в PDF запущена')
-    files_list = sorted([i for i in os.listdir('cropped_pages')], key=sort_by_number)
-    image_list = []
-    image_dict = {}
-    for file in files_list:
-        image = Image.open(f'cropped_pages/{file}')
+    files_list = sorted([i for i in os.listdir(pict_path)], key=sort_by_number)
+    # LOGGER.debug(files_list)
+    first_file = str(files_list[:1]).strip("'[]'")
+    start_page = Image.open(f'{pict_path}/{first_file}')
+    start_page.save(r'new_book.pdf')
+    for file in files_list[1:]:
+        image = Image.open(f'{pict_path}/{file}')
         page = image.convert('RGB')
-        image_list.append(page)
-        image_dict[file] = page
-    page.save(r'new_book.pdf', save_all=True, append_images=image_list)
+        page.save(r'new_book.pdf', append=True)
     LOGGER.success(f'Сохранил книгу в PDF!')
 
 
 def main():
     LOGGER.debug(f'Программа запущена')
     scrap_y_n = input('Нужно парсить? (y/n или д/н): ')
+    crop_y_n = input('Нужно резать на отдельные страницы? (y/n или д/н): ')
+    convert_y_n = input('Нужно сохранять в PDF документ? (y/n или д/н): ')
     if scrap_y_n in ('y', 'д'):
         scrap_screenshots()
-    crop_y_n = input('Режем на отдельные страницы? (y/n или д/н): ')
+    pict_path = 'saved_pages'
     if crop_y_n in ('y', 'д'):
         crop_screenshots()
-    convert_y_n = input('Сохраняем в один PDF документ? (y/n или д/н): ')
+        pict_path = 'cropped_pages'
     if convert_y_n in ('y', 'д'):
-        convert_to_pdf()
+            convert_to_pdf(pict_path)
     LOGGER.success(f'Программа завершилась!')
 
 main()
