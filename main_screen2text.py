@@ -1,5 +1,6 @@
 import time
 import os
+import shutil
 from loguru import logger as LOGGER
 from selenium import webdriver
 from selenium.webdriver import Keys
@@ -18,7 +19,7 @@ def scrap_screenshots():
         os.makedirs("saved_pages")
     driver = webdriver.Firefox()
     try:
-        driver.get(url)
+        driver.get(url)  # открываем браузер с нужной стартовой страницей
     except:
         LOGGER.error('Ошибка при открытии ссылки!')
     input('Парсер готов, нажми ENTER для старта')
@@ -43,7 +44,6 @@ def crop_screenshots():
     for file in files_list:
         image_left = Image.open(f'saved_pages/{file}')  # будет левая страница
         image_right = Image.open(f'saved_pages/{file}')  # будет правая страница
-        # image_left.show()   # открыть картинку
         crop_region_left = (50, 100, 1225, 1200)  # координаты области образки left, upper, right, lower
         image_cropped_left = image_left.crop(crop_region_left)
         image_cropped_left.save(f'cropped_pages/{file[:-4]}1left.png', quality=95, subsampling=0)
@@ -76,7 +76,10 @@ def convert_to_pdf(pict_path):
 
 # удаляем директории с картинками
 def clear_files():
-    pass
+    shutil.rmtree('cropped_pages', ignore_errors=True)
+    shutil.rmtree('saved_pages', ignore_errors=True)
+    LOGGER.success(f'Директории с картинками удалены!')
+
 
 def main():
     LOGGER.debug(f'Программа запущена')
@@ -97,5 +100,6 @@ def main():
     if clear_y_n in ('y', 'д'):
         clear_files()
     LOGGER.success(f'Программа завершилась!')
+
 
 main()
