@@ -13,6 +13,7 @@ LOGGER.add('logs/debug.log', format='{time}|{level}|{module}.{function}:{line} -
 
 # сохранение страниц
 def scrap_screenshots():
+    LOGGER.debug(f'Парсер скриншотов запущен')
     if not os.path.exists("saved_pages"):  # создаем директорию для сохранения страниц
         os.makedirs("saved_pages")
     driver = webdriver.Firefox()
@@ -35,6 +36,7 @@ def scrap_screenshots():
 
 # обрезка сдвоенных страниц
 def crop_screenshots():
+    LOGGER.debug(f'Кадрирование картинок запущено')
     if not os.path.exists("cropped_pages"):  # создаем директорию для кадрированных картинок
         os.makedirs("cropped_pages")
     files_list = [i for i in os.listdir('saved_pages')]  # список сохраненных файлов
@@ -44,32 +46,46 @@ def crop_screenshots():
         # image_left.show()   # открыть картинку
         crop_region_left = (50, 100, 1225, 1200)  # координаты области образки left, upper, right, lower
         image_cropped_left = image_left.crop(crop_region_left)
-        image_cropped_left.save(f'cropped_pages/{file}_cleft.png', quality=95, subsampling=0)
+        image_cropped_left.save(f'cropped_pages/{file[:-4]}1cleft.png', quality=95, subsampling=0)
         crop_region_right = (1325, 100, 2500, 1200)  # координаты области образки left, upper, right, lower
         image_cropped_right = image_right.crop(crop_region_right)
-        image_cropped_right.save(f'cropped_pages/{file}_cright.png', quality=95, subsampling=0)
+        image_cropped_right.save(f'cropped_pages/{file[:-4]}2cright.png', quality=95, subsampling=0)
+    LOGGER.success(f'Закончил резать картинки!')
+
+
+# фильтр для сортировки по части имени файла
+def sort_by_number(item):
+    stop = item.index('c')
+    number = item[5:stop]
+    return int(number)
 
 
 # сохраняем в один pdf файл
 def convert_to_pdf():
-    files_list = [i for i in os.listdir('cropped_pages')]
-    print(files_list)
+    LOGGER.debug(f'Конвертация в PDF запущена')
+    files_list = sorted([i for i in os.listdir('cropped_pages')], key=sort_by_number)
     image_list = []
+    image_dict = {}
     for file in files_list:
         image = Image.open(f'cropped_pages/{file}')
         page = image.convert('RGB')
         image_list.append(page)
-    print(image_list)
-    page.save(r'book_pdf.pdf', save_all=True, append_images=image_list)
+        image_dict[file] = page
+    page.save(r'new_book.pdf', save_all=True, append_images=image_list)
+    LOGGER.success(f'Сохранил книгу в PDF!')
 
 
 def main():
-    scrap_screenshots()
+    LOGGER.debug(f'Программа запущена')
+    scrap_y_n = input('Нужно парсить? (y/n или д/н): ')
+    if scrap_y_n in ('y', 'д'):
+        scrap_screenshots()
     crop_y_n = input('Режем на отдельные страницы? (y/n или д/н): ')
     if crop_y_n in ('y', 'д'):
         crop_screenshots()
     convert_y_n = input('Сохраняем в один PDF документ? (y/n или д/н): ')
     if convert_y_n in ('y', 'д'):
         convert_to_pdf()
+    LOGGER.success(f'Программа завершилась!')
 
 main()
