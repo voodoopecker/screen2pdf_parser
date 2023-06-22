@@ -101,4 +101,5 @@ def main():
     LOGGER.success(f'Script terminated!')
 
 
-main()
+if __name__ == '__main__':
+    main()
