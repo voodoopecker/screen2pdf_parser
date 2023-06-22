@@ -44,7 +44,7 @@ def crop_screenshots():
     for file in files_list:
         image_left = Image.open(f'saved_pages/{file}')  # будет левая страница
         image_right = Image.open(f'saved_pages/{file}')  # будет правая страница
-        crop_region_left = (50, 100, 1225, 1200)  # координаты области образки left, upper, right, lower
+        crop_region_left = (50, 100, 1225, 1200)  # координаты области обрезки left, upper, right, lower
         image_cropped_left = image_left.crop(crop_region_left)
         image_cropped_left.save(f'cropped_pages/{file[:-4]}1left.png', quality=95, subsampling=0)
         crop_region_right = (1325, 100, 2500, 1200)  # координаты области образки left, upper, right, lower
