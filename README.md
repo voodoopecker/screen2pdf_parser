@@ -1,4 +1,5 @@
-The scraping script is designed for online books. It retrieves all pages one by one and saves them to a PDF file for offline reading. But you could use it for any convenient purpose.
+# Description
+Screen2pdf Saver - The scraping script is designed for online books. It retrieves all pages one by one and saves them to a PDF file for offline reading. But you could use it for any convenient purpose.
 
 ![](start.jpg)
 
